@@ -8,12 +8,12 @@ use simplehtmldom_1_5\simple_html_dom;
 use Sunra\PhpSimple\HtmlDomParser;
 
 /**
-*  The CssTreeShaking class
-*
-*  Helps you to eliminate the portions of CSS you aren't using.
+ * The CssTreeShaking class
+ *
+ * Helps you to eliminate the portions of CSS you aren't using.
  * Usually should be used to generate AMP pages,
  * where is the fixed limit for maximum styles size.
-*/
+ */
 class CssTreeShaking {
 
   /**
@@ -31,6 +31,13 @@ class CssTreeShaking {
   protected $styles;
 
   /**
+   * Current limit for styles (50kb).
+   *
+   * @var int
+   */
+  protected $stylesLimit;
+
+  /**
    * List of already checked selectors.
    *
    * @var bool[]
@@ -45,8 +52,9 @@ class CssTreeShaking {
    *
    * @throws \Exception
    */
-  public function __construct(string $html) {
+  public function __construct(string $html, int $stylesLimit = 50000) {
     $this->html = HtmlDomParser::str_get_html($html);
+    $this->stylesLimit = $stylesLimit;
 
     if (!$this->html instanceof simple_html_dom) {
       throw new \Exception('Invalid HTML');
@@ -54,11 +62,30 @@ class CssTreeShaking {
   }
 
   /**
+   * Check if current styles should be shaken.
+   *
+   * @return bool
+   */
+  protected function shouldBeShacken(): bool {
+    $totalSize = 0;
+
+    foreach ($this->styles as $style) {
+      $totalSize += strlen($style->innertext());
+    }
+
+    return $totalSize >= $this->stylesLimit;
+  }
+
+  /**
    * Do the shaking and return the initial HTML with updated styles.
+   *
+   * @param bool $force
+   *   In case of TRUE, styles will be shaken anyway,
+   *   otherwise only if the limit is exceeded.
    *
    * @return string
    */
-  public function shakeIt(): string {
+  public function shakeIt(bool $force = FALSE): string {
     foreach ($this->html->find('style') as $styleNode) {
       // Skip the AMP Boilerplate Code.
       if ($styleNode->getAttribute('amp-boilerplate')) {
@@ -70,6 +97,10 @@ class CssTreeShaking {
 
     // No styles found, return the initial HTML.
     if (empty($this->styles)) {
+      return (string) $this->html;
+    }
+    // Styles are fit into the limit. Shaking is not needed.
+    elseif (!($this->shouldBeShacken() || $force)) {
       return (string) $this->html;
     }
 
@@ -86,7 +117,7 @@ class CssTreeShaking {
           if (!isset($this->checkedSelectors[$rawSelector])) {
             // Found a dead css, remove the selector.
             if (!$this->html->find($rawSelector)) {
-              $parsedCss->removeDeclarationBlockBySelector($selector);
+              $parsedCss->removeDeclarationBlockBySelector($selector, TRUE);
             }
 
             $this->checkedSelectors[$rawSelector] = TRUE;

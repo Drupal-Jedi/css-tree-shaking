@@ -25,6 +25,12 @@ $optimizedHtml = $cssShaker->shakeIt();
 ```
 Where `$html` is raw HTML with inliny styles.
 
+By default, styles will be shaken only if the limit (50kb) is exceeded.
+If you want to shake the styles in any case, just call the `shakeIt()` with a `TRUE` argument:
+```php
+$optimizedHtml = $cssShaker->shakeIt(TRUE);
+```
+
 Features
 --------
 
