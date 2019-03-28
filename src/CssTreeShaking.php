@@ -70,7 +70,7 @@ class CssTreeShaking {
     $totalSize = 0;
 
     foreach ($this->styles as $style) {
-      $totalSize += strlen($style->innertext());
+      $totalSize += \strlen($style->innertext());
     }
 
     return $totalSize >= $this->stylesLimit;
@@ -112,7 +112,10 @@ class CssTreeShaking {
       foreach ($parsedCss->getAllDeclarationBlocks() as $declarationBlock) {
         /** @var \Sabberworm\CSS\Property\Selector $selector */
         foreach ($declarationBlock->getSelectors() as $selector) {
-          $rawSelector = explode(':', $selector->getSelector())[0];
+          $rawSelector = \explode(':', $selector->getSelector())[0];
+
+          // Delete duplicated classes from selector, ex: ".ex-class.ex-class".
+          $rawSelector = \preg_replace('/(\.[^\.\ \{\,\:\;]+)\1+/', '$1', $rawSelector);
 
           if (!isset($this->checkedSelectors[$rawSelector])) {
             // Found a dead css, remove the selector.
