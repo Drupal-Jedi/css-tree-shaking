@@ -28,7 +28,7 @@ class CssTreeShaking {
    *
    * @var \simplehtmldom_1_5\simple_html_dom_node[]
    */
-  protected $styles;
+  protected $styles = [];
 
   /**
    * Current limit for styles (50kb).
@@ -66,8 +66,12 @@ class CssTreeShaking {
    *
    * @return bool
    */
-  protected function shouldBeShacken(): bool {
+  public function shouldBeShacken(): bool {
     $totalSize = 0;
+
+    if (empty($this->styles)) {
+      $this->extractStyles();
+    }
 
     foreach ($this->styles as $style) {
       $totalSize += \strlen($style->innertext());
@@ -86,14 +90,7 @@ class CssTreeShaking {
    * @return string
    */
   public function shakeIt(bool $force = FALSE): string {
-    foreach ($this->html->find('style') as $styleNode) {
-      // Skip the AMP Boilerplate Code.
-      if ($styleNode->getAttribute('amp-boilerplate')) {
-        continue;
-      }
-
-      $this->styles[] = $styleNode;
-    }
+    $this->extractStyles();
 
     // No styles found, return the initial HTML.
     if (empty($this->styles)) {
@@ -132,6 +129,25 @@ class CssTreeShaking {
     }
 
     return (string) $this->html;
+  }
+
+  /**
+   * Extract custom styles from HTML to process.
+   */
+  protected function extractStyles(): void {
+    if (!empty($this->styles)) {
+      // Avoid double extraction.
+      return;
+    }
+
+    foreach ($this->html->find('style') as $styleNode) {
+      // Skip the AMP Boilerplate Code.
+      if ($styleNode->getAttribute('amp-boilerplate')) {
+        continue;
+      }
+
+      $this->styles[] = $styleNode;
+    }
   }
 
 }
