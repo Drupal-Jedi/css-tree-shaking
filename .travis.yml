@@ -6,4 +6,4 @@ php:
 before_script:
   - composer install
 
-script: phpunit --bootstrap=vendor/autoload.php tests/ShackingTest.php
+script: phpunit --bootstrap=vendor/autoload.php tests
