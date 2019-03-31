@@ -3,36 +3,80 @@
 use DrupalJedi\CssTreeShaking;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class ShackingTest.
+ */
 class ShackingTest extends TestCase {
 
   /**
-   * Test handling of stylesheets with spaces in the background-image URLs.
+   * Testing, that styles should be shaken based on styles size.
    *
-   * @dataProvider get_data_html
+   * @dataProvider getShouldBeShackenData
    * @covers \DrupalJedi\CssTreeShaking::shouldBeShacken
    *
    * @param string $source
-   *   Source URL string.
+   *   Source HTML.
    * @param number $limit
    *   Max size for styles.
    * @param bool $expected
-   *   Expected normalized URL string.
+   *   Expected test result for current source.
    */
   public function testShouldBeShacken(string $source, int $limit, bool $expected): void {
     $shaker = new CssTreeShaking($source, $limit);
 
     $this->assertSame($expected, $shaker->shouldBeShacken());
+  }
 
-    $shaker->shakeIt();
+  /**
+   * Testing, that $shaker object can be created with correct html.
+   *
+   * @dataProvider getInitializationData
+   * @covers \DrupalJedi\CssTreeShaking::__construct
+   *
+   * @param string $source
+   *   Source HTML.
+   * @param bool $expected
+   *   Expected test result for current source.
+   */
+  public function testInitialization(string $source, bool $expected): void {
+    $initialized = TRUE;
+
+    try {
+      new CssTreeShaking($source);
+    }
+    catch (\Exception $e) {
+      $initialized = FALSE;
+    }
+
+    $this->assertSame($expected, $initialized);
   }
 
   /**
    * Provide dummy html pages for testing.
    *
    * @return array
-   *   Dummy HTML pages for shacking.
+   *   Dummy HTML pages for initialization.
    */
-  public function get_data_html(): array {
+  public function getInitializationData(): array {
+    return [
+      [
+        '',
+        FALSE,
+      ],
+      [
+        '<html><head><style amp-custom>body{display:inline-block;}.missed-not-so-class{color:red;}</style></head><body></body></html>',
+        TRUE
+      ],
+    ];
+  }
+
+  /**
+   * Provide dummy html pages for testing.
+   *
+   * @return array
+   *   Dummy HTML pages for checking.
+   */
+  public function getShouldBeShackenData(): array {
     return [
       [
         '<html><head><style amp-custom>body{display:inline-block;}.missed-class{color:red;}</style></head><body></body></html>',
