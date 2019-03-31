@@ -6,4 +6,7 @@ php:
 before_script:
   - composer install
 
-script: phpunit --bootstrap=vendor/autoload.php tests
+script: phpunit
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
