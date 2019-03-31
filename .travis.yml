@@ -1,3 +1,6 @@
+os:
+  - linux
+
 language: php
 
 php:
@@ -6,4 +9,6 @@ php:
 before_script:
   - composer install
 
-script: phpunit --bootstrap=vendor/autoload.php tests
+script: phpunit
+
+after_script: ./codeclimate.sh
