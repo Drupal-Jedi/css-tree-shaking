@@ -9,7 +9,7 @@ class ShackingTest extends TestCase {
    * Test handling of stylesheets with spaces in the background-image URLs.
    *
    * @dataProvider get_data_html
-   * @covers \DrupalJedi\CssTreeShaking::shouldBeShacken()
+   * @covers \DrupalJedi\CssTreeShaking::shouldBeShacken
    *
    * @param string $source
    *   Source URL string.

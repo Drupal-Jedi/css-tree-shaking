@@ -1,6 +1,3 @@
-os:
-  - linux
-
 language: php
 
 php:
@@ -11,4 +8,5 @@ before_script:
 
 script: phpunit
 
-after_script: ./codeclimate.sh
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
