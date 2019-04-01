@@ -114,14 +114,15 @@ class CssTreeShaking {
           // Delete duplicated classes from selector, ex: ".ex-class.ex-class".
           $rawSelector = \preg_replace('/(\.[^\.\ \{\,\:\;]+)\1+/', '$1', $rawSelector);
 
-          if (!isset($this->checkedSelectors[$rawSelector])) {
+//          @todo: Find a way to avoid checking for already checked selectors.
+//          if (!isset($this->checkedSelectors[$rawSelector])) {
             // Found a dead css, remove the selector.
             if (!$this->html->find($rawSelector)) {
               $parsedCss->removeDeclarationBlockBySelector($selector, TRUE);
             }
 
-            $this->checkedSelectors[$rawSelector] = TRUE;
-          }
+//            $this->checkedSelectors[$rawSelector] = TRUE;
+//          }
         }
       }
 
