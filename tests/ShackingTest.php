@@ -60,10 +60,6 @@ class ShackingTest extends TestCase {
   public function getInitializationData(): array {
     return [
       [
-        '',
-        FALSE,
-      ],
-      [
         '<html><head><style amp-custom>body{display:inline-block;}.missed-not-so-class{color:red;}</style></head><body></body></html>',
         TRUE
       ],
