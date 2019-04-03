@@ -4,8 +4,7 @@ namespace DrupalJedi;
 
 use Sabberworm\CSS\OutputFormat;
 use Sabberworm\CSS\Parser;
-use simplehtmldom_1_5\simple_html_dom;
-use Sunra\PhpSimple\HtmlDomParser;
+use Symfony\Component\DomCrawler\Crawler;
 
 /**
  * The CssTreeShaking class
@@ -19,14 +18,14 @@ class CssTreeShaking {
   /**
    * HTML to manipulate.
    *
-   * @var \simplehtmldom_1_5\simple_html_dom
+   * @var \Symfony\Component\DomCrawler\Crawler
    */
   protected $html;
 
   /**
    * All parsed styles.
    *
-   * @var \simplehtmldom_1_5\simple_html_dom_node[]
+   * @var \DOMElement[]
    */
   protected $styles = [];
 
@@ -53,12 +52,8 @@ class CssTreeShaking {
    * @throws \Exception
    */
   public function __construct(string $html, int $stylesLimit = 50000) {
-    $this->html = HtmlDomParser::str_get_html($html);
+    $this->html = new Crawler($html);
     $this->stylesLimit = $stylesLimit;
-
-    if (!$this->html instanceof simple_html_dom) {
-      throw new \Exception('Invalid HTML');
-    }
   }
 
   /**
@@ -74,7 +69,7 @@ class CssTreeShaking {
     }
 
     foreach ($this->styles as $style) {
-      $totalSize += \strlen($style->innertext());
+      $totalSize += \strlen($style->nodeValue);
     }
 
     return $totalSize >= $this->stylesLimit;
@@ -96,13 +91,14 @@ class CssTreeShaking {
     if (empty($this->styles)) {
       return (string) $this->html;
     }
+
     // Styles are fit into the limit. Shaking is not needed.
-    elseif (!($this->shouldBeShacken() || $force)) {
+    if (!($this->shouldBeShacken() || $force)) {
       return (string) $this->html;
     }
 
     foreach ($this->styles as $style) {
-      $cssParser = new Parser($style->innertext());
+      $cssParser = new Parser($style->nodeValue);
       $parsedCss = $cssParser->parse();
 
       /** @var \Sabberworm\CSS\RuleSet\DeclarationBlock $declarationBlock */
@@ -116,20 +112,20 @@ class CssTreeShaking {
 
 //          @todo: Find a way to avoid checking for already checked selectors.
 //          if (!isset($this->checkedSelectors[$rawSelector])) {
-            // Found a dead css, remove the selector.
-            if (!$this->html->find($rawSelector)) {
-              $parsedCss->removeDeclarationBlockBySelector($selector, TRUE);
-            }
+          // Found a dead css, remove the selector.
+          if (!$this->html->filter($rawSelector)->count()) {
+            $parsedCss->removeDeclarationBlockBySelector($selector, TRUE);
+          }
 
 //            $this->checkedSelectors[$rawSelector] = TRUE;
 //          }
         }
       }
 
-      $style->innertext = $parsedCss->render(OutputFormat::createCompact());
+      $style->nodeValue = $parsedCss->render(OutputFormat::createCompact());
     }
 
-    return (string) $this->html;
+    return $this->html->html();
   }
 
   /**
@@ -141,14 +137,10 @@ class CssTreeShaking {
       return;
     }
 
-    foreach ($this->html->find('style') as $styleNode) {
-      // Skip the AMP Boilerplate Code.
-      if ($styleNode->getAttribute('amp-boilerplate')) {
-        continue;
-      }
-
-      $this->styles[] = $styleNode;
-    }
+    $this->html->filter('style:not([amp-boilerplate])')->each(function ($style) {
+      /** @var \Symfony\Component\DomCrawler\Crawler $style */
+      $this->styles[] = $style->getNode(0);
+    });
   }
 
 }

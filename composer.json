@@ -11,8 +11,10 @@
   "type": "library",
   "require": {
     "php": ">=7.1",
-    "sunra/php-simple-html-dom-parser": "^1.5",
-    "sabberworm/php-css-parser": "^8.2"
+    "ext-dom": "*",
+    "sabberworm/php-css-parser": "^8.2",
+    "symfony/css-selector": "^3",
+    "symfony/dom-crawler": "~3.0"
   },
   "autoload": {
     "psr-4": {
