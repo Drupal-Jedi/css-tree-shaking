@@ -125,7 +125,7 @@ class CssTreeShaking {
       $style->nodeValue = $parsedCss->render(OutputFormat::createCompact());
     }
 
-    return $this->html->html();
+    return $this->html->getNode(0)->parentNode->saveHTML();
   }
 
   /**
