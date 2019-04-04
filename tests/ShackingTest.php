@@ -87,6 +87,21 @@ class ShackingTest extends TestCase {
         TRUE,
       ],
       [
+        '<html><head><style amp-custom></style></head><body></body></html>',
+        '',
+        TRUE,
+      ],
+      [
+        '<html><head><style></style></head><body></body></html>',
+        '',
+        TRUE,
+      ],
+      [
+        '<html><head></head><body></body></html>',
+        '',
+        TRUE,
+      ],
+      [
         '<html><head><style>body{display:inline-block;}</style><style>.missed-class{color:red;}</style></head><body></body></html>',
         'body{display:inline-block;}',
         TRUE,
