@@ -2,8 +2,10 @@
 
 namespace DrupalJedi;
 
+use Sabberworm\CSS\CSSList\CSSBlockList;
 use Sabberworm\CSS\OutputFormat;
 use Sabberworm\CSS\Parser;
+use Sabberworm\CSS\RuleSet\DeclarationBlock;
 use Symfony\Component\DomCrawler\Crawler;
 
 /**
@@ -66,11 +68,11 @@ class CssTreeShaking {
   public function shouldBeShacken(): bool {
     $totalSize = 0;
 
-    if (empty($this->styles)) {
+    if (!$this->getStyles()) {
       $this->extractStyles();
     }
 
-    foreach ($this->styles as $style) {
+    foreach ($this->getStyles() as $style) {
       $totalSize += \strlen($style->nodeValue);
     }
 
@@ -90,47 +92,83 @@ class CssTreeShaking {
     $this->extractStyles();
 
     // No styles found, return the initial HTML.
-    if (empty($this->styles)) {
-      return (string) $this->html;
+    if (!$this->getStyles()) {
+      return $this->html->getNode(0)->parentNode->saveHTML();
     }
 
     // Styles are fit into the limit. Shaking is not needed.
     if (!($this->shouldBeShacken() || $force)) {
-      return (string) $this->html;
+      return $this->html->getNode(0)->parentNode->saveHTML();
     }
 
-    foreach ($this->styles as $style) {
+    foreach ($this->getStyles() as $style) {
       $cssParser = new Parser($style->nodeValue);
       $parsedCss = $cssParser->parse();
 
-      /** @var \Sabberworm\CSS\RuleSet\DeclarationBlock $declarationBlock */
-      foreach ($parsedCss->getAllDeclarationBlocks() as $declarationBlock) {
-        /** @var \Sabberworm\CSS\Property\Selector $selector */
-        foreach ($declarationBlock->getSelectors() as $selector) {
-          $rawSelector = \explode(':', $selector->getSelector())[0];
-
-          // Delete duplicated classes from selector, ex: ".ex-class.ex-class".
-          $rawSelector = \preg_replace('/(\.[^\.\ \{\,\:\;]+)\1+/', '$1', $rawSelector);
-
-          if (!isset($this->checkedSelectors[$rawSelector])) {
-            $this->checkedSelectors[$rawSelector] = FALSE;
-
-            // Found a dead css, remove the selector.
-            if (!$this->html->filter($rawSelector)->count()) {
-              $parsedCss->removeDeclarationBlockBySelector($selector, TRUE);
-              $this->checkedSelectors[$rawSelector] = TRUE;
-            }
-          }
-          elseif (isset($this->checkedSelectors[$rawSelector]) && $this->checkedSelectors[$rawSelector]) {
-            $parsedCss->removeDeclarationBlockBySelector($selector, TRUE);
-          }
-        }
-      }
+      $this->processStyles($parsedCss);
 
       $style->nodeValue = $parsedCss->render(OutputFormat::createCompact());
     }
 
     return $this->html->getNode(0)->parentNode->saveHTML();
+  }
+
+  /**
+   * Process css blocks.
+   *
+   * @param \Sabberworm\CSS\CSSList\CSSBlockList $parsedCss
+   *   Parsed Css.
+   *
+   * @codeCoverageIgnore
+   */
+  protected function processStyles(CSSBlockList $parsedCss): void {
+    foreach ($parsedCss->getContents() as $content) {
+      if ($content instanceof CSSBlockList) {
+        $this->processStyles($content);
+        if (!$content->getContents()) {
+          $parsedCss->remove($content);
+        }
+        continue;
+      }
+
+      if ($content instanceof DeclarationBlock) {
+        $this->processDeclarationBlock($content, $parsedCss);
+      }
+    }
+  }
+
+  /**
+   * Process selectors inside block.
+   *
+   * @param \Sabberworm\CSS\RuleSet\DeclarationBlock $block
+   *   CSS block with selectors.
+   * @param \Sabberworm\CSS\CSSList\CSSBlockList $parsedCss
+   *   Parsed CSS document.
+   *
+   * @codeCoverageIgnore
+   */
+  protected function processDeclarationBlock(DeclarationBlock $block, CSSBlockList $parsedCss): void {
+    foreach ($block->getSelectors() as $selector) {
+      $rawSelector = \explode(':', $selector->getSelector())[0];
+
+      // Delete duplicated classes from selector, ex: ".ex-class.ex-class".
+      $rawSelector = \preg_replace('/(\.[^\.\ \{\,\:\;]+)\1+/', '$1', $rawSelector);
+
+      if (!isset($this->checkedSelectors[$rawSelector])) {
+        $this->checkedSelectors[$rawSelector] = FALSE;
+
+        // Found a dead css, remove the selector.
+        if (!$this->html->filter($rawSelector)->count()) {
+          $parsedCss->removeDeclarationBlockBySelector($selector, TRUE);
+          $block->removeSelector($selector);
+          $this->checkedSelectors[$rawSelector] = TRUE;
+        }
+      }
+      elseif (isset($this->checkedSelectors[$rawSelector]) && $this->checkedSelectors[$rawSelector]) {
+        $parsedCss->removeDeclarationBlockBySelector($selector, TRUE);
+        $block->removeSelector($selector);
+      }
+    }
   }
 
   /**
@@ -148,7 +186,7 @@ class CssTreeShaking {
    * Extract custom styles from HTML to process.
    */
   public function extractStyles(): void {
-    if (empty($this->styles)) {
+    if (!$this->getStyles()) {
       $this->html->filter('style:not([amp-boilerplate])')->each(function ($style) {
         /** @var \Symfony\Component\DomCrawler\Crawler $style */
         $node = $style->getNode(0);

@@ -49,10 +49,116 @@ class ShackingTest extends TestCase {
   }
 
   /**
+   * Testing, that styles shaked successfuly.
+   *
+   * @dataProvider getShakeItData
+   * @covers \DrupalJedi\CssTreeShaking::shakeIt
+   *
+   * @param string $source
+   *   Source HTML.
+   * @param string $expectedStyles
+   *   Expected styles, that should be kept.
+   * @param bool $force
+   *   Use force mode or not.
+   */
+  public function testShakeIt(string $source, string $expectedStyles, bool $force): void {
+    $shaker = new CssTreeShaking($source);
+    $shaker->shakeIt($force);
+    $styles = '';
+
+    foreach ($shaker->getStyles() as $style) {
+      $styles .= $style->nodeValue;
+    }
+
+    $this->assertSame($expectedStyles, $styles);
+  }
+
+  /**
    * Provide dummy html pages for testing.
    *
    * @return array
-   *   Dummy HTML pages for initialization.
+   *   Dummy HTML pages for shaking.
+   */
+  public function getShakeItData(): array {
+    return [
+      [
+        '<html><head><style amp-custom>body{display:inline-block;}.missed-class{color:red;}</style></head><body></body></html>',
+        'body{display:inline-block;}',
+        TRUE,
+      ],
+      [
+        '<html><head><style>body{display:inline-block;}</style><style>.missed-class{color:red;}</style></head><body></body></html>',
+        'body{display:inline-block;}',
+        TRUE,
+      ],
+      [
+        '<html><head><style>.missed-class{color:red;}</style><style>body{display:inline-block;}</style></head><body></body></html>',
+        '.missed-class{color:red;}body{display:inline-block;}',
+        FALSE,
+      ],
+      [
+        '<html><head><style amp-custom>body{display:inline-block;}.missed-class{color:red;}</style></head><body></body></html>',
+        'body{display:inline-block;}.missed-class{color:red;}',
+        FALSE,
+      ],
+      [
+        '<html><head><style amp-custom>body{display:inline-block;}#num1{color: red;}.missed-class{color:red;}</style></head><body><div id="num1"></div></body></html>',
+        'body{display:inline-block;}#num1{color:red;}',
+        TRUE,
+      ],
+      [
+        '<html><head><style amp-custom>body{display:inline-block;}.abc,#num1{color: red;}.missed-class{color:red;}</style></head><body><div id="num1"></div></body></html>',
+        'body{display:inline-block;}#num1{color:red;}',
+        TRUE,
+      ],
+      [
+        '<html><head><style amp-custom>body : green;</style></head><body><div id="num1"></div></body></html>',
+        '',
+        TRUE,
+      ],
+      [
+        '<html><head><style amp-custom>@media screen and (max-width: 1000px) {body {color: green;}}</style></head><body><div id="num1"></div></body></html>',
+        '@media screen and (max-width: 1000px){body{color:green;}}',
+        TRUE,
+      ],
+      [
+        '<html><head><style amp-custom>@media screen and (max-width: 1000px) {h1 {color: green;}}body {color: green;}</style></head><body><div id="num1"></div></body></html>',
+        'body{color:green;}',
+        TRUE,
+      ],
+      [
+        '<html><head><style amp-custom>@media screen and (max-width: 1000px) {h1 {color: green;}}</style></head><body><div id="num1"></div></body></html>',
+        '',
+        TRUE,
+      ],
+      [
+        '<html><head><style amp-keyframes>@keyframes anim1 { from { opacity:0.0 } to { opacity:0.5 } } @media (min-width: 600px) {@keyframes anim1 { from { opacity:0.5 } to { opacity:1.0 } } }</style></head><body><div id="num1"></div></body></html>',
+        '@keyframes anim1{from{opacity:0;}to{opacity:.5;}}@media (min-width: 600px){@keyframes anim1{from{opacity:.5;}to{opacity:1;}}}',
+        TRUE,
+      ],
+      [
+        '<html><head><style amp-keyframes>@media screen and ( max-width: 640px ){div > span{font-style:normal}}</style></head><body><div id="num1"></div></body></html>',
+        '',
+        TRUE,
+      ],
+      [
+        '<html><head><style amp-keyframes>@media screen and ( max-width: 640px ){div > span{font-style:normal}}</style></head><body><div id="num1"><span>test</span></div></body></html>',
+        '@media screen and ( max-width: 640px ){div > span{font-style:normal;}}',
+        TRUE,
+      ],
+      [
+        '<html><head><style amp-keyframes>@media screen and ( max-width: 640px ){@keyframes anim1 { from { opacity:0.0 } to { opacity:0.5 } }}</style></head><body><div id="num1"><span>test</span></div></body></html>',
+        '@media screen and ( max-width: 640px ){@keyframes anim1{from{opacity:0;}to{opacity:.5;}}}',
+        TRUE,
+      ],
+    ];
+  }
+
+  /**
+   * Provide dummy html pages for testing.
+   *
+   * @return array
+   *   Dummy HTML pages for extracting.
    */
   public function getExtractStylesData(): array {
     return [
