@@ -28,27 +28,24 @@ class ShackingTest extends TestCase {
   }
 
   /**
-   * Testing, that $shaker object can be created with correct html.
+   * Testing, that styles can be extracted from html.
    *
-   * @dataProvider getInitializationData
-   * @covers \DrupalJedi\CssTreeShaking::__construct
+   * @dataProvider getExtractStylesData
+   * @covers \DrupalJedi\CssTreeShaking::extractStyles
    *
    * @param string $source
    *   Source HTML.
    * @param bool $expected
    *   Expected test result for current source.
    */
-  public function testInitialization(string $source, bool $expected): void {
-    $initialized = TRUE;
+  public function testExtractStyles(string $source, bool $expected): void {
 
-    try {
-      new CssTreeShaking($source);
-    }
-    catch (\Exception $e) {
-      $initialized = FALSE;
-    }
+    $shaker = new CssTreeShaking($source);
+    $shaker->extractStyles();
 
-    $this->assertSame($expected, $initialized);
+    $styles = $shaker->getStyles();
+
+    $this->assertSame($expected, (bool) $styles);
   }
 
   /**
@@ -57,8 +54,20 @@ class ShackingTest extends TestCase {
    * @return array
    *   Dummy HTML pages for initialization.
    */
-  public function getInitializationData(): array {
+  public function getExtractStylesData(): array {
     return [
+      [
+        '<html><head></head><body></body></html>',
+        FALSE
+      ],
+      [
+        '<html><head><style amp-boilerplate>@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style></head><body></body></html>',
+        FALSE
+      ],
+      [
+        '<html><head><style></style></head><body></body></html>',
+        FALSE
+      ],
       [
         '<html><head><style amp-custom>body{display:inline-block;}.missed-not-so-class{color:red;}</style></head><body></body></html>',
         TRUE

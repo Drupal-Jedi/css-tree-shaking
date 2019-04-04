@@ -48,8 +48,8 @@ class CssTreeShaking {
    *
    * @param string $html
    *   Initial HTML that need's to be optimized.
-   *
-   * @throws \Exception
+   * @param int $stylesLimit
+   *   Limit for styles size, 50000 by default.
    */
   public function __construct(string $html, int $stylesLimit = 50000) {
     $this->html = new Crawler($html);
@@ -132,9 +132,20 @@ class CssTreeShaking {
   }
 
   /**
+   * Get styles.
+   *
+   * @return \DOMElement[]|null
+   *
+   * @codeCoverageIgnore
+   */
+  public function getStyles(): ?array {
+    return $this->styles;
+  }
+
+  /**
    * Extract custom styles from HTML to process.
    */
-  protected function extractStyles(): void {
+  public function extractStyles(): void {
     if (!empty($this->styles)) {
       // Avoid double extraction.
       return;
@@ -142,7 +153,10 @@ class CssTreeShaking {
 
     $this->html->filter('style:not([amp-boilerplate])')->each(function ($style) {
       /** @var \Symfony\Component\DomCrawler\Crawler $style */
-      $this->styles[] = $style->getNode(0);
+      $node = $style->getNode(0);
+      if ($node->nodeValue) {
+        $this->styles[] = $node;
+      }
     });
   }
 
