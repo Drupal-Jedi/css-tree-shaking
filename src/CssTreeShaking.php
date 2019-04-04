@@ -148,6 +148,10 @@ class CssTreeShaking {
    * @codeCoverageIgnore
    */
   protected function processDeclarationBlock(DeclarationBlock $block, CSSBlockList $parsedCss): void {
+    if (!$block->getRules()) {
+      $parsedCss->remove($block);
+    }
+
     foreach ($block->getSelectors() as $selector) {
       $rawSelector = \explode(':', $selector->getSelector())[0];
 

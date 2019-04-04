@@ -137,20 +137,35 @@ class ShackingTest extends TestCase {
         TRUE,
       ],
       [
-        '<html><head><style amp-keyframes>@media screen and ( max-width: 640px ){div > span{font-style:normal}}</style></head><body><div id="num1"></div></body></html>',
+        '<html><head><style>@media screen and ( max-width: 640px ){div > span{font-style:normal}}</style></head><body><div id="num1"></div></body></html>',
         '',
         TRUE,
       ],
       [
-        '<html><head><style amp-keyframes>@media screen and ( max-width: 640px ){div > span{font-style:normal}}</style></head><body><div id="num1"><span>test</span></div></body></html>',
+        '<html><head><style>@media screen and ( max-width: 640px ){div > span{font-style:normal}}</style></head><body><div id="num1"><span>test</span></div></body></html>',
         '@media screen and ( max-width: 640px ){div > span{font-style:normal;}}',
         TRUE,
       ],
       [
-        '<html><head><style amp-keyframes>@media screen and ( max-width: 640px ){@keyframes anim1 { from { opacity:0.0 } to { opacity:0.5 } }}</style></head><body><div id="num1"><span>test</span></div></body></html>',
+        '<html><head><style>@media screen and ( max-width: 640px ){@keyframes anim1 { from { opacity:0.0 } to { opacity:0.5 } }}</style></head><body><div id="num1"><span>test</span></div></body></html>',
         '@media screen and ( max-width: 640px ){@keyframes anim1{from{opacity:0;}to{opacity:.5;}}}',
         TRUE,
       ],
+      [
+        '<html><head><style>@supports (--a:0){.post table .cell::after{color:red}}</style></head><body class="post"><div><table><tr><td class="cell"></td></tr></table></div></body></html>',
+        '@supports (--a:0){.post table .cell::after{color:red;}}',
+        TRUE,
+      ],
+      [
+        '<html><head><style>@supports (--a:0){.post table .cell::after{}}</style></head><body class="post"><div><table><tr><td class="cell"></td></tr></table></div></body></html>',
+        '',
+        TRUE,
+      ],
+      [
+        '<html><head><style>@supports (--a:0){.post table .cell::after{}}</style></head><body class="post"><div><table><tr><td></td></tr></table></div></body></html>',
+        '',
+        TRUE,
+      ]
     ];
   }
 
