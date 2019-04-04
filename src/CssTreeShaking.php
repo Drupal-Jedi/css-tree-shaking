@@ -93,12 +93,12 @@ class CssTreeShaking {
 
     // No styles found, return the initial HTML.
     if (!$this->getStyles()) {
-      return $this->html->getNode(0)->parentNode->saveHTML();
+      return $this->exportHtml();
     }
 
     // Styles are fit into the limit. Shaking is not needed.
     if (!($this->shouldBeShacken() || $force)) {
-      return $this->html->getNode(0)->parentNode->saveHTML();
+      return $this->exportHtml();
     }
 
     foreach ($this->getStyles() as $style) {
@@ -110,7 +110,21 @@ class CssTreeShaking {
       $style->nodeValue = $parsedCss->render(OutputFormat::createCompact());
     }
 
-    return $this->html->getNode(0)->parentNode->saveHTML();
+    return $this->exportHtml();
+  }
+
+  /**
+   * Export HTML from internal structure.
+   *
+   * @return string
+   *   Resulting HTML.
+   */
+  protected function exportHtml(): string {
+    /** @var \DOMElement $element */
+    $element = $this->html->getNode(0);
+    $doctype = '<!doctype html>';
+
+    return $doctype . $element->parentNode->saveHTML($element);
   }
 
   /**
