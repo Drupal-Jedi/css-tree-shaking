@@ -21,7 +21,7 @@ class ShackingTest extends TestCase {
    * @param bool $expected
    *   Expected test result for current source.
    */
-  public function testShouldBeShacken(string $source, int $limit, bool $expected): void {
+  public function testShouldBeShacken(string $source, int $limit, bool $expected) {
     $shaker = new CssTreeShaking($source, $limit);
 
     $this->assertSame($expected, $shaker->shouldBeShacken());
@@ -38,7 +38,7 @@ class ShackingTest extends TestCase {
    * @param bool $expected
    *   Expected test result for current source.
    */
-  public function testExtractStyles(string $source, bool $expected): void {
+  public function testExtractStyles(string $source, bool $expected) {
 
     $shaker = new CssTreeShaking($source);
     $shaker->extractStyles();
@@ -61,7 +61,7 @@ class ShackingTest extends TestCase {
    * @param bool $force
    *   Use force mode or not.
    */
-  public function testShakeIt(string $source, string $expectedStyles, bool $force): void {
+  public function testShakeIt(string $source, string $expectedStyles, bool $force) {
     $shaker = new CssTreeShaking($source);
     $shaker->shakeIt($force);
     $styles = '';
