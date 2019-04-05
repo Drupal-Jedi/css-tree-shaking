@@ -10,7 +10,7 @@
   ],
   "type": "library",
   "require": {
-    "php": ">=7.1",
+    "php": ">=7.0",
     "ext-dom": "*",
     "sabberworm/php-css-parser": "^8.2",
     "symfony/css-selector": "^3",
