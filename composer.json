@@ -1,7 +1,7 @@
 {
   "name": "drupaljedi/css-tree-shaking",
   "description": "Helps you to eliminate the portions of CSS you aren't using. Usually should be used to generate AMP pages, where is the fixed limit for maximum styles size.",
-  "license": "GPL-3.0",
+  "license": "GPL-2.0-or-later",
   "authors": [
     {
       "name": "Dmitry Kiselev",
