@@ -135,7 +135,7 @@ class CssTreeShaking {
    *
    * @codeCoverageIgnore
    */
-  protected function processStyles(CSSBlockList $parsedCss): void {
+  protected function processStyles(CSSBlockList $parsedCss) {
     foreach ($parsedCss->getContents() as $content) {
       if ($content instanceof CSSBlockList) {
         $this->processStyles($content);
@@ -161,7 +161,7 @@ class CssTreeShaking {
    *
    * @codeCoverageIgnore
    */
-  protected function processDeclarationBlock(DeclarationBlock $block, CSSBlockList $parsedCss): void {
+  protected function processDeclarationBlock(DeclarationBlock $block, CSSBlockList $parsedCss) {
     if (!$block->getRules()) {
       $parsedCss->remove($block);
     }
@@ -190,14 +190,14 @@ class CssTreeShaking {
    *
    * @codeCoverageIgnore
    */
-  public function getStyles(): ?array {
+  public function getStyles() {
     return $this->styles;
   }
 
   /**
    * Extract custom styles from HTML to process.
    */
-  public function extractStyles(): void {
+  public function extractStyles() {
     if (!$this->getStyles()) {
       $this->html->filter('style:not([amp-boilerplate])')->each(function ($style) {
         /** @var \Symfony\Component\DomCrawler\Crawler $style */
