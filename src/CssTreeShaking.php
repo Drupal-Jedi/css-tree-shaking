@@ -15,7 +15,7 @@ use Symfony\Component\DomCrawler\Crawler;
  * Usually should be used to generate AMP pages,
  * where is the fixed limit for maximum styles size.
  */
-class CssTreeShaking {
+class CssTreeShaking implements ShakingInterface {
 
   /**
    * HTML to manipulate.
@@ -61,9 +61,7 @@ class CssTreeShaking {
   }
 
   /**
-   * Check if current styles should be shaken.
-   *
-   * @return bool
+   * @inheritDoc
    */
   public function shouldBeShacken(): bool {
     $totalSize = 0;
@@ -80,13 +78,7 @@ class CssTreeShaking {
   }
 
   /**
-   * Do the shaking and return the initial HTML with updated styles.
-   *
-   * @param bool $force
-   *   In case of TRUE, styles will be shaken anyway,
-   *   otherwise only if the limit is exceeded.
-   *
-   * @return string
+   * @inheritDoc
    */
   public function shakeIt(bool $force = FALSE): string {
     $this->extractStyles();
@@ -195,7 +187,7 @@ class CssTreeShaking {
   }
 
   /**
-   * Extract custom styles from HTML to process.
+   * @inheritDoc
    */
   public function extractStyles() {
     if (!$this->getStyles()) {
