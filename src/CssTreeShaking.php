@@ -176,11 +176,7 @@ class CssTreeShaking implements ShakingInterface {
   }
 
   /**
-   * Get styles.
-   *
-   * @return \DOMElement[]|null
-   *
-   * @codeCoverageIgnore
+   * @inheritDoc
    */
   public function getStyles() {
     return $this->styles;

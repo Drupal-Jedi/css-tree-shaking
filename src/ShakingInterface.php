@@ -30,4 +30,13 @@ interface ShakingInterface {
    */
   public function extractStyles();
 
+  /**
+   * Get styles.
+   *
+   * @return \DOMElement[]|null
+   *
+   * @codeCoverageIgnore
+   */
+  public function getStyles();
+
 }
