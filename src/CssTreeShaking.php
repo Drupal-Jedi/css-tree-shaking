@@ -106,12 +106,9 @@ class CssTreeShaking implements ShakingInterface {
   }
 
   /**
-   * Export HTML from internal structure.
-   *
-   * @return string
-   *   Resulting HTML.
+   * @inheritDoc
    */
-  protected function exportHtml(): string {
+  public function exportHtml(): string {
     /** @var \DOMElement $element */
     $element = $this->html->getNode(0);
     $doctype = '<!doctype html>';
@@ -177,6 +174,8 @@ class CssTreeShaking implements ShakingInterface {
 
   /**
    * @inheritDoc
+   *
+   * @codeCoverageIgnore
    */
   public function getStyles() {
     return $this->styles;

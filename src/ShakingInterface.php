@@ -34,9 +34,15 @@ interface ShakingInterface {
    * Get styles.
    *
    * @return \DOMElement[]|null
-   *
-   * @codeCoverageIgnore
    */
   public function getStyles();
+
+  /**
+   * Export HTML from internal structure.
+   *
+   * @return string
+   *   Resulting HTML.
+   */
+  public function exportHtml(): string;
 
 }

@@ -74,6 +74,23 @@ class ShackingTest extends TestCase {
   }
 
   /**
+   * Testing, that HTML can be exported.
+   *
+   * @dataProvider getExportHtmlData
+   * @covers \DrupalJedi\CssTreeShaking::exportHtml
+   *
+   * @param string $source
+   *   Source HTML.
+   * @param string $expectedHTML
+   *   Expected styles, that should be kept.
+   */
+  public function testExportHtml(string $source, string $expectedHTML) {
+    $shaker = new CssTreeShaking($source);
+
+    $this->assertSame($expectedHTML, $shaker->exportHtml());
+  }
+
+  /**
    * Provide dummy html pages for testing.
    *
    * @return array
@@ -233,6 +250,40 @@ class ShackingTest extends TestCase {
         '<html><head><style amp-custom>body{display:inline-block;}.missed-not-so-loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong-class{color:red;}</style></head><body></body></html>',
         100,
         TRUE
+      ],
+    ];
+  }
+
+  /**
+   * Provide dummy html pages for testing.
+   *
+   * @return array
+   *   Dummy HTML pages for checking.
+   */
+  public function getExportHtmlData(): array {
+    return [
+      [
+        '<html><head><style amp-custom>body{display:inline-block;}.missed-class{color:red;}</style></head><body></body></html>',
+        '<!doctype html><html>
+<head><style amp-custom>body{display:inline-block;}.missed-class{color:red;}</style></head>
+<body></body>
+</html>'
+      ],
+      [
+        '<html><head></head><body></body><broken-tag></html>',
+        '<!doctype html><html>
+<head></head>
+<body></body>
+<broken-tag></broken-tag>
+</html>',
+      ],
+      [
+        '<html><head></head><body></body><img></html>',
+        '<!doctype html><html>
+<head></head>
+<body></body>
+<img>
+</html>',
       ],
     ];
   }
