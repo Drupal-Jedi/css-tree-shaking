@@ -1,7 +1,7 @@
 CSS Tree Shaking
 ================
 
-[![Build Status](https://travis-ci.org/Drupal-Jedi/css-tree-shaking.svg?branch=master)](https://travis-ci.org/Drupal-Jedi/css-tree-shaking) [![codecov](https://codecov.io/gh/Drupal-Jedi/css-tree-shaking/branch/master/graph/badge.svg)](https://codecov.io/gh/Drupal-Jedi/css-tree-shaking) [![Maintainability](https://api.codeclimate.com/v1/badges/f04970e2df024e38b46b/maintainability)](https://codeclimate.com/github/Drupal-Jedi/css-tree-shaking/maintainability)
+[![Build Status](https://travis-ci.org/Drupal-Jedi/css-tree-shaking.svg?branch=master)](https://travis-ci.org/Drupal-Jedi/css-tree-shaking) [![codecov](https://codecov.io/gh/Drupal-Jedi/css-tree-shaking/branch/master/graph/badge.svg)](https://codecov.io/gh/Drupal-Jedi/css-tree-shaking) [![Maintainability](https://api.codeclimate.com/v1/badges/f04970e2df024e38b46b/maintainability)](https://codeclimate.com/github/Drupal-Jedi/css-tree-shaking/maintainability) [![Total Downloads](https://poser.pugx.org/drupalJedi/css-tree-shaking/downloads)](https://packagist.org/packages/drupalJedi/css-tree-shaking)
 
 Helps you to eliminate the portions of CSS you aren't using. Usually should be used to generate AMP pages, where is the fixed limit for maximum styles size.
 
