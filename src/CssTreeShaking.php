@@ -133,8 +133,7 @@ class CssTreeShaking implements ShakingInterface {
         }
         continue;
       }
-
-      if ($content instanceof DeclarationBlock) {
+      elseif ($content instanceof DeclarationBlock) {
         $this->processDeclarationBlock($content, $parsedCss);
       }
     }
