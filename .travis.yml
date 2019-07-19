@@ -6,7 +6,7 @@ php:
 before_script:
   - composer install
 
-script: phpunit
+script: ./vendor/bin/phpunit
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
