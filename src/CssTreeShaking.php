@@ -135,16 +135,16 @@ class CssTreeShaking implements ShakingInterface {
     }
   }
 
-    /**
-     * Process list of css blocks.
-     *
-     * @param \Sabberworm\CSS\CSSList\CSSBlockList $content
-     *   Parsed CSS for processing.
-     * @param \Sabberworm\CSS\CSSList\CSSBlockList $parsedCss
-     *   Resulted parsed CSS.
-     *
-     * @codeCoverageIgnore
-     */
+  /**
+   * Process list of css blocks.
+   *
+   * @param \Sabberworm\CSS\CSSList\CSSBlockList $content
+   *   Parsed CSS for processing.
+   * @param \Sabberworm\CSS\CSSList\CSSBlockList $parsedCss
+   *   Resulted parsed CSS.
+   *
+   * @codeCoverageIgnore
+   */
   protected function processCssBlockList(CSSBlockList $content, CSSBlockList $parsedCss) {
     $this->processStyles($content);
     if (!$content->getContents()) {
