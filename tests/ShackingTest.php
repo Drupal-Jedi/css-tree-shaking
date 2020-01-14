@@ -264,26 +264,15 @@ class ShackingTest extends TestCase {
     return [
       [
         '<html><head><style amp-custom>body{display:inline-block;}.missed-class{color:red;}</style></head><body></body></html>',
-        '<!doctype html><html>
-<head><style amp-custom>body{display:inline-block;}.missed-class{color:red;}</style></head>
-<body></body>
-</html>'
+        '<!doctype html><html><head><style amp-custom>body{display:inline-block;}.missed-class{color:red;}</style></head><body></body></html>'
       ],
       [
         '<html><head></head><body></body><broken-tag></html>',
-        '<!doctype html><html>
-<head></head>
-<body></body>
-<broken-tag></broken-tag>
-</html>',
+        '<!doctype html><html><head></head><body></body><broken-tag></broken-tag></html>',
       ],
       [
         '<html><head></head><body></body><img></html>',
-        '<!doctype html><html>
-<head></head>
-<body></body>
-<img>
-</html>',
+        '<!doctype html><html><head></head><body></body><img></html>',
       ],
     ];
   }
